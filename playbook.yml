@@ -1,0 +1,28 @@
+---
+- name: Update apt cache
+  hosts: all
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+- name: Deploy to webservers
+  hosts: all
+  roles:
+    - geerlingguy.pip
+  tasks:
+    - name: Create Redmine container
+      docker_container:
+        name: redmine-app
+        image: redmine:4.2.1
+        recreate: yes
+        pull: yes
+        ports:
+          - 3000:3000
+        state: started
+        env:
+          REDMINE_DB_DATABASE: "{{ redmine_db_database }}"
+          REDMINE_DB_POSTGRES: "{{ redmine_db_postgres }}"
+          REDMINE_DB_USERNAME: "{{ redmine_db_username }}"
+          REDMINE_DB_PASSWORD: "{{ redmine_db_password }}"
+          REDMINE_DB_PORT: "{{ redmine_db_port | int }}"
